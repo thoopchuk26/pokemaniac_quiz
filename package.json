@@ -3,9 +3,17 @@
   "version": "1.0.0",
   "description": "A pokemon quiz regarding all the more complicated information regarding pokemon",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx esbuild src/index.ts --bundle --outfile=index.js --minify",
+    "serve": "npx esbuild src/index.ts --bundle --outfile=index.js --target=ie11 --servedir=.",
+    "typecheck": "npx tsc --noEmit"
   },
   "author": "thoopchuk26",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.19.2",
+    "lodash": "^4.17.21",
+    "nodemon": "^3.0.1"
+  }
 }
