@@ -1,4 +1,4 @@
-const moves = [
+export const moves = [
     {
         "Accuracy": 100,
         "DamageType": "physical",

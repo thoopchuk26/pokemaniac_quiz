@@ -1,6 +1,3 @@
 node_modules
 index.js
-images/*
-!images/favicon.ico
-!images/damage_type_icons/
-!images/type_icons/
+images/sprites/

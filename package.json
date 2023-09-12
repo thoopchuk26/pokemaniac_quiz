@@ -3,13 +3,20 @@
   "version": "1.0.0",
   "description": "A pokemon quiz regarding all the more complicated information regarding pokemon",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "build": "npx esbuild src/index.ts --bundle --outfile=index.js --minify",
-    "serve": "npx esbuild src/index.ts --bundle --outfile=index.js --target=ie11 --servedir=.",
+    "serve": "npx esbuild src/index.ts --bundle --outfile=index.js --servedir=.",
     "typecheck": "npx tsc --noEmit"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thoopchuk26/pokemaniac_quiz.git"
+  },
   "author": "thoopchuk26",
+  "bugs": {
+    "url": "https://github.com/thoopchuk26/pokemaniac_quiz/issues"
+  },
+  "homepage": "https://github.com/thoopchuk26/pokemaniac_quiz#readme",
   "license": "ISC",
   "dependencies": {
     "esbuild": "^0.19.2",

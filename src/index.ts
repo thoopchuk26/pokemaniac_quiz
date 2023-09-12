@@ -4,5 +4,5 @@ import range from 'lodash/range';
 import shuffle from 'lodash/shuffle';
 
 import {pokemon} from './Pokemon';
-
+import {moves} from './Moves';
 
