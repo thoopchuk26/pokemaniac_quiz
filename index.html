@@ -9,29 +9,90 @@
     <link rel="stylesheet" href="css/style.css" link>
     <script src="index.js" type="application/javascript"></script>
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script type="module" src="src/index.js" defer></script>
 </head>
 <body>
-    <main class="main">
-        <header class="header">
-            <a href="#" class="logo">Pokemaniac Quiz</a>
-
-            <nav class="navbar">
-                <a href="#" quiz-type="ability" title="Given the Pokemon name an ability that Pokemon has">Abilities</a>
-                <a href="#" quiz-type="species" title="given the species name a Pokemon from it">Species</a>
-                <a href="#" quiz-type="shiny" title="Given a Shiny Sprite tell if it's correct">Shiny</a>
-                <a href="#" quiz-type="stat" title="Given two Pokemon and a Stat tell which Pokemon has the higher stat">Stat VS.</a>
-            </nav>
+    <nav class="sidebar close">
+        <header>
+            <div class="imageText">
+                <div class="image">
+                    <img src="images/favicon.ico" alt="logo">
+                </div>
+                <div class="text">
+                    <h1 class="quizTypes">Quiz Types</h1>
+                </div>
+            </div>
+            <i class='bx bxs-right-arrow toggle'></i>
         </header>
 
-        <section class="home">
-            <div class="home-content">
-                <h1>Welcome to the Pokemaniac Quiz!</h1>
-                <p>
-                    Test your Pokemon knowledge on tough questions about pokemon's attributes in the games.
-                </p>
+        <div class="menu-bar">
+            <div class="menu">
+                <ul clas="menuLinks">
+                    <li class="navLink">
+                        <a href="#" class="text" title="Given a Pokemon give one of its abilities">
+                            Ability Quiz
+                        </a>
+                    </li>
+                    <li class="navLink">
+                        <a href="#" class="text" title="Given a Pokemon give its Species name">
+                            Species Quiz
+                        </a>
+                    </li>
+                    <li class="navLink">
+                        <a href="#" class="text" title="Given a Shiny Pokemon give whether its altered">
+                            Shiny Quiz
+                        </a>
+                    </li>
+                    <li class="navLink">
+                        <a href="#" class="text" title="Given two Pokemon and a Stat, give which Pokemon has the higher value of that Stat">
+                            Stat Showdown
+                        </a>
+                    </li>
+                </ul>
             </div>
-        </section>
-    </main>
+        </div>
+    </nav>
 
+    <div id="container">
+        <div id="stats" class="menu">
+            <h2 id="streakHeader" class="sectionHead">Streak</h2>
+			<div class="sidebox">
+				<h3 class="translatable">Current</h3>
+				<h1 class="currentCountText">0</h1>
+			</div>
+
+            <div class="sidebox">
+				<h3 class="translatable">Best</h3>
+				<h1 class="bestCountText">0</h1>
+			</div>
+		</div>
+
+        <div id="middle">
+            <div id="quiz">
+                <header>
+                    <h1 class="title">What's that Pok&eacute;mon's ability?</h1>
+                </header>
+
+                <div id="playArea">
+                    <div id="canvasContainer">
+                        <canvas id="image">
+                            You need a new-ish browser to play this, and you need Javascript enabled too.
+                        </canvas>
+                    </div>
+                
+                    <div id="answerArea">
+                        <input type="text" id="guess" name="guess" tabindex="1" autocomplete="off" autocorrect="off" spellcheck="false" />
+
+                        <a id="giveAnswer" class="dontKnow">I don't know!</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="footer" class="translatable" data-lang="footer">
+                Send feedback or contribute at GitHub. Images © Nintendo.
+            </div>
+        </div>
+    </div>
 </body>
 </html>

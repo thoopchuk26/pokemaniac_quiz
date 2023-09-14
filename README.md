@@ -2,7 +2,7 @@
 
 A browser-based game to test the player's extensive knowledge of the Pokemon within the games.
 
-Partially inspired by the amazing Who's That Pokemon Quiz found here https://github.com/Menardi/whosthatpokemon/tree/master
+Inspired by the amazing Who's That Pokemon Quiz found here https://github.com/Menardi/whosthatpokemon/tree/master
 
 ## Development
 
@@ -25,3 +25,10 @@ To build the site to be deployed online, run:
 ```
 npm run build
 ```
+
+## Licence
+This code is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/).
+
+All the Pokémon names and images are copyrighted by Nintendo.
+
+Type and Damage icons are from https://bulbapedia.bulbagarden.net/wiki/Main_Page

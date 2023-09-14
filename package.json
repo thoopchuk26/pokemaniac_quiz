@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "A pokemon quiz regarding all the more complicated information regarding pokemon",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "build": "npx esbuild src/index.ts --bundle --outfile=index.js --minify",
-    "serve": "npx esbuild src/index.ts --bundle --outfile=index.js --servedir=.",
+    "build": "npx esbuild src/index.js --bundle --outfile=index.js --minify",
+    "serve": "npx esbuild src/index.js --bundle --outfile=index.js --servedir=.",
     "typecheck": "npx tsc --noEmit"
   },
   "repository": {
