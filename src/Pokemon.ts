@@ -19615,4 +19615,4 @@ export const pokemon = [
         "Type1": "ghost",
         "Type2": "N/A"
     }
-];
+] as const;

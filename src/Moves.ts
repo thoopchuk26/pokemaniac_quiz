@@ -10799,4 +10799,4 @@ export const moves = [
         "Target": "selected-pokemon",
         "Type": "fairy"
     }
-];
+] as const;
