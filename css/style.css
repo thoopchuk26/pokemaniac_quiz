@@ -67,6 +67,14 @@ h2.sectionHead {
     margin: 0 0 0 0;
 }
 
+#stats .diffSelect {
+    color: #FFF;
+}
+
+#stats a:hover{
+    color: #B233FF;
+}
+
 #middle {
     width: 520px;
     min-height: 580px;
@@ -124,7 +132,11 @@ h2.sectionHead {
     align-items: center;
 }
 
-.sidebar .text{
+.sidebar .title {
+    white-space: nowrap;
+}
+
+.sidebar .quizSelector{
     font-size: 20px;
     font-weight: 500;
     color: #FFF;
@@ -133,7 +145,11 @@ h2.sectionHead {
     white-space: nowrap;
 }
 
-.sidebar.close .text {
+.sidebar.close .title {
+    opacity: 0;
+}
+
+.sidebar.close .quizSelector {
     opacity: 0;
 }
 
