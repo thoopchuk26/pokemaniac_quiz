@@ -26,23 +26,19 @@ type QuizTypeKey = keyof typeof QUIZTYPE;
 type QuizType = typeof QUIZTYPE[QuizTypeKey];
 
 let pendingDifficulty: Difficulty;
-let currentQuizType:QuizType = QUIZTYPE.ABILITY;
+let currentQuizType:QuizType = QUIZTYPE.ABILITY as QuizType;
 
 let maxPokemonID: number = pokemon[pokemon.length-1]['ID'];
 
 let currentPokemonID: number[];
 let currentPokemonName: string;
-let currentPokemonImageUrl: string | null;
-
-let currentPairPokemonImageUrl: string[];
+let currentPokemonImageUrl: string[];
 
 let upcomingPokemon: number[];
 let currentPokemonIndex: number;
 let timeTaken: number = -1;
 
 let loadedImage: HTMLImageElement;
-
-let preloadedDifficulty = -1;
 
 const onReady = () => {
     const onSideBarClick = function (this: HTMLElement) {
@@ -63,14 +59,12 @@ const onReady = () => {
     document.querySelectorAll('.diffSelector').forEach(el => el.addEventListener('click', onDiffMenuClick));
 
     const onUnknownClick = function (this:HTMLElement) {
-        generatePokemon(currentQuizType);
-        displayPokemon();
+        generatePokemon();
     }
     document.querySelector('.dontKnow')!.addEventListener('click', onUnknownClick);
 
     generateRandomArray();
-    generatePokemon(currentQuizType);
-    displayPokemon();
+    generatePokemon();
 }
 
 if (document.readyState !== 'loading') {
@@ -79,28 +73,31 @@ if (document.readyState !== 'loading') {
     document.addEventListener('DOMContentLoaded', onReady);
 }
 
-function generatePokemon(quizType: QuizType){
+function generatePokemon(){
     let pokemonId = upcomingPokemon[currentPokemonIndex];
-    switch (quizType){
+    let isPair: boolean = false;
+    switch (currentQuizType){
         case QUIZTYPE.ABILITY:
             generateSingleMonQuizData(pokemonId);
-            currentPokemonImageUrl = 'images/sprites/front_default_sprite/' + pokemonId.toString() + '.png';
+            currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + pokemonId.toString() + '.png'];
             break;
         case QUIZTYPE.SHINY:
             generateSingleMonQuizData(pokemonId);
-            currentPokemonImageUrl = 'images/sprites/shiny_front_default_sprite/' + pokemonId.toString() + '.png';
+            currentPokemonImageUrl = ['images/sprites/shiny_front_default_sprite/' + pokemonId.toString() + '.png'];
             break;
         case QUIZTYPE.SPECIES:
             generateSingleMonQuizData(pokemonId);
-            currentPokemonImageUrl = 'images/sprites/front_default_sprite/' + pokemonId.toString() + '.png';
+            currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + pokemonId.toString() + '.png'];
             break;
         case QUIZTYPE.STATVS:
             currentPokemonID = generatePokemonPair();
-            currentPairPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png', 'images/sprites/front_default_sprite/' + currentPokemonID[1].toString() + '.png'];
+            currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png', 'images/sprites/front_default_sprite/' + currentPokemonID[1].toString() + '.png'];
+            isPair = true;
             break;
         default:
             break;
     }
+    displayPokemon(isPair);
 }
 
 function generateSingleMonQuizData(pokemonId: number){
@@ -122,14 +119,18 @@ function generateRandomArray(){
 
 function generatePokemonPair(): number[]{
     let pokemonId = Math.floor(Math.random() * maxPokemonID);
+    let pokemonPairId: number = -1;
+
     let statChoice = stats[Math.floor(Math.random()*7)];
     let pokemonStat: number = getPokemonStat(statChoice, pokemonId);
     let pokemonStatPair: number = 0;
-    while(!(pokemonStatPair > Math.floor(pokemonStat * 0.85) && pokemonStatPair < Math.floor(pokemonStat * 1.15))){
-        let pokemonPairId = Math.floor(Math.random() * maxPokemonID);
+
+    while((pokemonStatPair < Math.floor(pokemonStat * 0.80) || pokemonStatPair > Math.floor(pokemonStat * 1.20)) && pokemonPairId != pokemonId){
+        pokemonPairId = Math.floor(Math.random() * maxPokemonID);
         pokemonStatPair = getPokemonStat(statChoice, pokemonPairId);
     }
-    return [pokemonStat, pokemonStatPair];
+    
+    return [pokemonId+1, pokemonPairId+1];
 }
 
 function getPokemonStat(statChoice: string, pokemonId: number): number{
@@ -149,14 +150,31 @@ function setDifficulty(selectedDifficulty: Difficulty){
 }
 
 function setQuizType(selectedQuiz: QuizType){
-    
+    if(selectedQuiz == QUIZTYPE.STATVS && currentQuizType != QUIZTYPE.STATVS){
+        document.querySelector(".imageContainer")!.classList.toggle("solo");
+    }
+    else if(selectedQuiz != QUIZTYPE.STATVS && currentQuizType == QUIZTYPE.STATVS){
+        document.querySelector(".imageContainer")!.classList.toggle("solo");
+    }
+    currentQuizType = selectedQuiz;
+    generatePokemon();
 }
 
-function checkAnswer(input:string){
+function checkAnswer(input:string, quiz: QuizType){
     pokemon[currentPokemonID[0]]
 }
 
-function displayPokemon(){
+function displayPokemon(isPair: boolean){
     let pokemonImage = document.getElementById("pokemonImage")! as HTMLImageElement;
-    pokemonImage.src = currentPokemonImageUrl!;
+    let pokemonImagePair = document.getElementById("pokemonImagePair")! as HTMLImageElement;
+    if(isPair){
+        pokemonImagePair.hidden = false;
+        pokemonImage.src = currentPokemonImageUrl[0];
+        pokemonImagePair.src = currentPokemonImageUrl[1];
+    }
+    else{
+        pokemonImagePair.hidden = true;
+        pokemonImage.src = currentPokemonImageUrl[0];
+    }
+    
 }

@@ -189,12 +189,18 @@ h2.sectionHead {
     margin-top: -25px;
 }
 
-#pokemonImage {
-    width: 80%;
+#logo {
+    margin-left: 15px;
+}
+
+.imageContainer .quizImage{
+    width: 50%;
     height: auto;
     object-fit: contain;
 }
 
-#logo {
-    margin-left: 15px;
+.imageContainer.solo .quizImage{
+    width: 100%;
+    height: auto;
+    object-fit: contain;
 }
