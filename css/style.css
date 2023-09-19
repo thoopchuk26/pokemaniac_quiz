@@ -110,7 +110,7 @@ h2.sectionHead {
     top: 0;
     left: 0;
     height: 100%;
-    width: 200px;
+    width: 225px;
     background: #B233FF;
     transition: all 0.3s ease;
 }
@@ -187,4 +187,14 @@ h2.sectionHead {
 
 .sidebar ul{
     margin-top: -25px;
+}
+
+#pokemonImage {
+    width: 80%;
+    height: auto;
+    object-fit: contain;
+}
+
+#logo {
+    margin-left: 15px;
 }

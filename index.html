@@ -15,8 +15,8 @@
     <nav class="sidebar close">
         <header>
             <div class="imageText">
-                <div class="image">
-                    <img src="images/favicon.ico" alt="logo">
+                <div class="logoImage">
+                    <img class="image" id="logo" src="images/favicon.ico" alt="logo">
                 </div>
                 <div class="title">
                     <h1 class="quizTypes">Quiz Types</h1>
@@ -29,22 +29,22 @@
             <div class="menu">
                 <ul clas="menuLinks">
                     <li class="navLink">
-                        <a class="quizSelector" id="quiz0" title="Given a Pokemon give one of its abilities" quiz-type="ability">
+                        <a class="quizSelector" quiz-type="0" title="Given a Pokemon give one of its abilities" quiz-type="ability">
                             Ability Quiz
                         </a>
                     </li>
                     <li class="navLink">
-                        <a class="quizSelector" id="quiz1" title="Given a Pokemon give its Species name" quiz-type="species">
+                        <a class="quizSelector" quiz-type="1" title="Given a Pokemon give its Species name" quiz-type="species">
                             Species Quiz
                         </a>
                     </li>
                     <li class="navLink">
-                        <a class="quizSelector" id="quiz2" title="Given a Shiny Pokemon give whether its altered" quiz-type="shiny">
+                        <a class="quizSelector" quiz-type="2" title="Given a Shiny Pokemon give whether its altered" quiz-type="shiny">
                             Shiny Quiz
                         </a>
                     </li>
                     <li class="navLink">
-                        <a class="quizSelector" id="quiz3" title="Given two Pokemon and a Stat, give which Pokemon has the higher value of that Stat" quiz-type="stat">
+                        <a class="quizSelector" quiz-type="3" title="Given two Pokemon and a Stat, give which Pokemon has the higher value of that Stat" quiz-type="stat">
                             Stat Showdown
                         </a>
                     </li>
@@ -81,10 +81,8 @@
                 </header>
 
                 <div id="playArea">
-                    <div id="canvasContainer">
-                        <canvas id="image">
-                            You need a new-ish browser to play this, and you need Javascript enabled too.
-                        </canvas>
+                    <div id="imageContainer">
+                        <img class="image" id="pokemonImage" src="images/question_mark.png" alt="Default Sprite" >
                     </div>
                 
                     <div id="answerArea">

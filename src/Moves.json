@@ -1,4 +1,4 @@
-export const moves = [
+[
     {
         "Accuracy": 100,
         "DamageType": "physical",
@@ -10799,4 +10799,4 @@ export const moves = [
         "Target": "selected-pokemon",
         "Type": "fairy"
     }
-] as const;
+]

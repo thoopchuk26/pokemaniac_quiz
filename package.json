@@ -4,8 +4,8 @@
   "description": "A pokemon quiz regarding all the more complicated information regarding pokemon",
   "main": "index.ts",
   "scripts": {
-    "build": "npx esbuild src/index.ts --bundle --outfile=index.js --minify",
-    "serve": "npx esbuild src/index.ts --bundle --outfile=index.js --servedir=.",
+    "build": "npx esbuild src/index.ts --bundle --minify --target=chrome58 --outfile=index.js ",
+    "serve": "npx esbuild src/index.ts --bundle --servedir=. --target=chrome58 --outfile=index.js ",
     "typecheck": "npx tsc --noEmit"
   },
   "repository": {
@@ -20,9 +20,14 @@
   "license": "ISC",
   "dependencies": {
     "@types/lodash": "^4.14.198",
-    "esbuild": "^0.19.2",
     "lodash": "^4.17.21",
-    "nodemon": "^3.0.1",
-    "sqlite3": "^5.1.6"
-  }
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.2",
+    "esbuild": "0.19.3",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "keywords": []
 }

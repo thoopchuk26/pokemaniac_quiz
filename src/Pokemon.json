@@ -1,4 +1,4 @@
-export const pokemon = [
+[
     {
         "Ability": "overgrow",
         "Attack": 49,
@@ -16159,4 +16159,4 @@ export const pokemon = [
         "Type1": "grass",
         "Type2": "psychic"
     }
-] as const;
+]
