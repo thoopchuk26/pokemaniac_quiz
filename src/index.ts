@@ -154,7 +154,7 @@ function generatePokemon(){
             break;
     }
     console.log(answer);
-    displayPokemon(isPair, isRealShiny);
+    displayPokemon(isRealShiny);
 }
 
 function generateSingleMonQuizData(){
@@ -233,55 +233,69 @@ function checkAnswer(input:string){
 }
 
 //dynamic sillouhette function used from https://github.com/Menardi/whosthatpokemon/
-function displayPokemon(isPair: boolean, isRealShiny: boolean){
+function displayPokemon(isRealShiny: boolean){
     const canvas = <HTMLCanvasElement> document.getElementById("shadowImage");
     const ctx = canvas.getContext('2d', {willReadFrequently: true})!;
 
-    loadedImage = new Image();
-    imagePair = new Image();
-    loadedImage.src = currentPokemonImageUrl[0];
-    if(currentPokemonImageUrl.length == 2){
-        imagePair.src = currentPokemonImageUrl[1];
+    let isPair = currentPokemonImageUrl.length == 2;
+    if(isPair){
+        loadImages(function(images){
+            ctx.drawImage(images[0], 0, canvas.height/4, canvas.width/2, canvas.height/2);
+            ctx.drawImage(images[1], canvas.width/2, canvas.height/4, canvas.width/2, canvas.height/2);
+        });
+        ctx.reset();
     }
-
-    loadedImage.onload = function(){
-        if(loadedImage.width <= 100) {
-            canvas.width = loadedImage.width * 4;
-            canvas.height = loadedImage.height * 4;
-        } else {
-            canvas.width = loadedImage.width;
-            canvas.height = loadedImage.height;
-        }
-
-        ctx.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
-
-        if(!isRealShiny) {
-            let rawImage = ctx.getImageData(0,0,canvas.width,canvas.height);
-            let rgb = [0,1,2];
-            let defaultColor = [0,1,2];
-            while(rgb.toString() == defaultColor.toString()){
-                rgb = shuffle(rgb);
+    else{
+        loadedImage = new Image();
+        loadedImage.src = currentPokemonImageUrl[0];
+        
+        loadedImage.onload = function(){
+            if(loadedImage.width <= 100) {
+                canvas.width = loadedImage.width * 4;
+                canvas.height = loadedImage.height * 4;
+            } else {
+                canvas.width = loadedImage.width;
+                canvas.height = loadedImage.height;
             }
-            for (let i=0; i<rawImage.data.length;i+=4) {
-                if(rawImage.data[i+3] >= 50) {
-                    let random = [rawImage.data[i+rgb[0]], rawImage.data[i+rgb[1]], rawImage.data[i+rgb[2]]]
-                    rawImage.data[i] = random[0];
-                    rawImage.data[i+1] = random[1];
-                    rawImage.data[i+2] = random[2];
-                    rawImage.data[i+3] = 255;
-                } else {
-                    rawImage.data[i+3] = 0;
+            
+            ctx.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
+
+            if(!isRealShiny) {
+                let rawImage = ctx.getImageData(0,0,canvas.width,canvas.height);
+                let rgb = [0,1,2];
+                let defaultColor = [0,1,2];
+                while(rgb.toString() == defaultColor.toString()){
+                    rgb = shuffle(rgb);
                 }
+                for (let i=0; i<rawImage.data.length;i+=4) {
+                    if(rawImage.data[i+3] >= 50) {
+                        let random = [rawImage.data[i+rgb[0]], rawImage.data[i+rgb[1]], rawImage.data[i+rgb[2]]]
+                        rawImage.data[i] = random[0];
+                        rawImage.data[i+1] = random[1];
+                        rawImage.data[i+2] = random[2];
+                        rawImage.data[i+3] = 255;
+                    } else {
+                        rawImage.data[i+3] = 0;
+                    }
+                }
+                ctx.putImageData(rawImage,0,0);
             }
-
-            ctx.putImageData(rawImage,0,0);
         }
     }
 
-    imagePair.onload = function() {
-        if(isPair){
-            ctx.drawImage(loadedImage, 0, canvas.height/4, canvas.width/2, canvas.height/2);
-            ctx.drawImage(imagePair, canvas.width/2, canvas.height/4, canvas.width/2, canvas.height/2);
+    function loadImages(callback: (arg0: { [id: number]: HTMLImageElement; }) => void){
+        var loadedImages = 0;
+        var numImages = currentPokemonImageUrl.length;
+        let images: {[id: number] : HTMLImageElement} = {};
+
+        for(let i = 0; i < numImages; i++){
+            images[i] = new Image();
+            images[i].onload = function() {
+                if(++loadedImages >= numImages){
+                    callback(images)
+                }
+            };
+            images[i].src = currentPokemonImageUrl[i];
         }
     }
 }
