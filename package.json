@@ -20,6 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/lodash": "^4.14.198",
+    "@vercel/analytics": "^1.0.2",
     "lodash": "^4.17.21",
     "typescript": "^5.2.2"
   },

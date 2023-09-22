@@ -253,13 +253,7 @@ function displayPokemon(isPair: boolean, isRealShiny: boolean){
             canvas.height = loadedImage.height;
         }
 
-        if(isPair){
-            ctx.drawImage(loadedImage, 0, canvas.height/4, canvas.width/2, canvas.height/2);
-            ctx.drawImage(imagePair, canvas.width/2, canvas.height/4, canvas.width/2, canvas.height/2);
-        }
-        else{
-            ctx.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
-        }
+        ctx.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
 
         if(!isRealShiny) {
             let rawImage = ctx.getImageData(0,0,canvas.width,canvas.height);
@@ -281,6 +275,13 @@ function displayPokemon(isPair: boolean, isRealShiny: boolean){
             }
 
             ctx.putImageData(rawImage,0,0);
+        }
+    }
+
+    imagePair.onload = function() {
+        if(isPair){
+            ctx.drawImage(loadedImage, 0, canvas.height/4, canvas.width/2, canvas.height/2);
+            ctx.drawImage(imagePair, canvas.width/2, canvas.height/4, canvas.width/2, canvas.height/2);
         }
     }
 }
