@@ -31,16 +31,16 @@ let currentQuizType:QuizType = QUIZTYPE.ABILITY as QuizType;
 let maxPokemonID: number = pokemon[pokemon.length-1]['ID'];
 
 let currentPokemonID: number[];
-let currentPokemonName: string;
 let currentPokemonImageUrl: string[];
 
 let upcomingPokemon: number[];
 let currentPokemonIndex: number;
 let timeTaken: number = -1;
 
-let loadedImage: HTMLImageElement;
 let question: HTMLElement;
 let answer: string[];
+let loadedImage: HTMLImageElement;
+let imagePair: HTMLImageElement;
 
 let questionContent: string[] = 
 ["What's an Ability this Pokemon has?", 
@@ -110,15 +110,15 @@ if (document.readyState !== 'loading') {
 function generatePokemon(){
     elements.input.hidden = false;
     elements.dontKnowButton.innerHTML = "I Don't Know";
-    let pokemonId = upcomingPokemon[currentPokemonIndex];
     let isPair: boolean = false;
+    let isRealShiny: boolean = true;
     switch (currentQuizType){
         case QUIZTYPE.ABILITY:
-            generateSingleMonQuizData(pokemonId);
-            currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + pokemonId.toString() + '.png'];
-            let temp = pokemon[currentPokemonID[0]].Ability.toLowerCase().split(/[\s,]+/);
-            if(pokemon[currentPokemonID[0]].HiddenAbility != 'N/A'){
-                temp.push(pokemon[currentPokemonID[0]].HiddenAbility.toLowerCase());
+            generateSingleMonQuizData();
+            currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png'];
+            let temp = pokemon[currentPokemonID[0]-1].Ability.toLowerCase().split(/[\s,]+/);
+            if(pokemon[currentPokemonID[0]-1].HiddenAbility != 'N/A'){
+                temp.push(pokemon[currentPokemonID[0]-1].HiddenAbility.toLowerCase());
             }
             for(let i = 0; i < temp.length; i++){
                 temp[i] = temp[i].replace("-", " ");
@@ -126,17 +126,24 @@ function generatePokemon(){
             answer = temp;
             break;
         case QUIZTYPE.SHINY:
-            generateSingleMonQuizData(pokemonId);
-            while (currentPokemonID[currentPokemonIndex] > 905){
-                generateSingleMonQuizData(pokemonId);
+            generateSingleMonQuizData();
+            while (currentPokemonID[0] > 905){
+                generateSingleMonQuizData();
             }
-            currentPokemonImageUrl = ['images/sprites/shiny_front_default_sprite/' + pokemonId.toString() + '.png'];
-            answer = ["true"];
+            let rand = Math.random();
+            isRealShiny = rand >= 0.5;
+            if(isRealShiny){
+                currentPokemonImageUrl = ['images/sprites/shiny_front_default_sprite/' + currentPokemonID[0].toString() + '.png'];
+            }
+            else{
+                currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png'];
+            }
+            answer = [isRealShiny.toString()];
             break;
         case QUIZTYPE.SPECIES:
-            generateSingleMonQuizData(pokemonId);
-            currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + pokemonId.toString() + '.png'];
-            answer = [pokemon[currentPokemonID[0]].Species.toLowerCase()];
+            generateSingleMonQuizData();
+            currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png'];
+            answer = [pokemon[currentPokemonID[0]-1].Species.toLowerCase()];
             break;
         case QUIZTYPE.STATVS:
             currentPokemonID = generatePokemonPair();
@@ -147,12 +154,11 @@ function generatePokemon(){
             break;
     }
     console.log(answer);
-    displayPokemon(isPair);
+    displayPokemon(isPair, isRealShiny);
 }
 
-function generateSingleMonQuizData(pokemonId: number){
-    currentPokemonID = [pokemonId];
-    currentPokemonName = pokemon[pokemonId].Name;
+function generateSingleMonQuizData(){
+    currentPokemonID = [upcomingPokemon[currentPokemonIndex]];
     currentPokemonIndex += 1;
     if (currentPokemonIndex >= maxPokemonID){
         generateRandomArray();
@@ -168,7 +174,7 @@ function generateRandomArray(){
 }
 
 function generatePokemonPair(): number[]{
-    let pokemonId = Math.floor(Math.random() * maxPokemonID);
+    let pokemonId = Math.floor(Math.random() * maxPokemonID) + 1;
     let pokemonPairId: number = -1;
 
     let statChoice = stats[Math.floor(Math.random()*7)];
@@ -176,14 +182,14 @@ function generatePokemonPair(): number[]{
     let pokemonStatPair: number = 0;
 
     while((pokemonStatPair < Math.floor(pokemonStat * 0.85) || pokemonStatPair > Math.floor(pokemonStat * 1.15)) && pokemonPairId != pokemonId){
-        pokemonPairId = Math.floor(Math.random() * maxPokemonID);
+        pokemonPairId = Math.floor(Math.random() * maxPokemonID) + 1;
         pokemonStatPair = getPokemonStat(statChoice, pokemonPairId);
     }
     
     question.innerHTML = questionContent[currentQuizType];
     question.innerHTML = question.innerHTML.replace("X", statChoice);
-    answer = pokemonStat > pokemonStatPair ? [pokemon[pokemonId].Name] : [pokemon[pokemonPairId].Name];
-    return [pokemonId+1, pokemonPairId+1];
+    answer = pokemonStat > pokemonStatPair ? [pokemon[pokemonId-1].Name] : [pokemon[pokemonPairId-1].Name];
+    return [pokemonId, pokemonPairId];
 }
 
 function getPokemonStat(statChoice: string, pokemonId: number): number{
@@ -226,17 +232,55 @@ function checkAnswer(input:string){
     }
 }
 
-function displayPokemon(isPair: boolean){
-    let pokemonImage = document.getElementById("pokemonImage")! as HTMLImageElement;
-    let pokemonImagePair = document.getElementById("pokemonImagePair")! as HTMLImageElement;
-    if(isPair){
-        pokemonImagePair.hidden = false;
-        pokemonImage.src = currentPokemonImageUrl[0];
-        pokemonImagePair.src = currentPokemonImageUrl[1];
+//dynamic sillouhette function used from https://github.com/Menardi/whosthatpokemon/
+function displayPokemon(isPair: boolean, isRealShiny: boolean){
+    const canvas = <HTMLCanvasElement> document.getElementById("shadowImage");
+    const ctx = canvas.getContext('2d', {willReadFrequently: true})!;
+
+    loadedImage = new Image();
+    imagePair = new Image();
+    loadedImage.src = currentPokemonImageUrl[0];
+    if(currentPokemonImageUrl.length == 2){
+        imagePair.src = currentPokemonImageUrl[1];
     }
-    else{
-        pokemonImagePair.hidden = true;
-        pokemonImage.src = currentPokemonImageUrl[0];
+
+    loadedImage.onload = function(){
+        if(loadedImage.width <= 100) {
+            canvas.width = loadedImage.width * 4;
+            canvas.height = loadedImage.height * 4;
+        } else {
+            canvas.width = loadedImage.width;
+            canvas.height = loadedImage.height;
+        }
+
+        if(isPair){
+            ctx.drawImage(loadedImage, 0, canvas.height/4, canvas.width/2, canvas.height/2);
+            ctx.drawImage(imagePair, canvas.width/2, canvas.height/4, canvas.width/2, canvas.height/2);
+        }
+        else{
+            ctx.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
+        }
+
+        if(!isRealShiny) {
+            let rawImage = ctx.getImageData(0,0,canvas.width,canvas.height);
+            let rgb = [0,1,2];
+            let defaultColor = [0,1,2];
+            while(rgb.toString() == defaultColor.toString()){
+                rgb = shuffle(rgb);
+            }
+            for (let i=0; i<rawImage.data.length;i+=4) {
+                if(rawImage.data[i+3] >= 50) {
+                    let random = [rawImage.data[i+rgb[0]], rawImage.data[i+rgb[1]], rawImage.data[i+rgb[2]]]
+                    rawImage.data[i] = random[0];
+                    rawImage.data[i+1] = random[1];
+                    rawImage.data[i+2] = random[2];
+                    rawImage.data[i+3] = 255;
+                } else {
+                    rawImage.data[i+3] = 0;
+                }
+            }
+
+            ctx.putImageData(rawImage,0,0);
+        }
     }
-    
 }
