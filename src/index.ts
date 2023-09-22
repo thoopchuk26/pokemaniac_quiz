@@ -174,7 +174,7 @@ function generateRandomArray(){
 }
 
 function generatePokemonPair(): number[]{
-    let pokemonId = Math.floor(Math.random() * maxPokemonID) + 1;
+    let pokemonId = Math.floor(Math.random() * maxPokemonID);
     let pokemonPairId: number = -1;
 
     let statChoice = stats[Math.floor(Math.random()*7)];
@@ -182,14 +182,14 @@ function generatePokemonPair(): number[]{
     let pokemonStatPair: number = 0;
 
     while((pokemonStatPair < Math.floor(pokemonStat * 0.85) || pokemonStatPair > Math.floor(pokemonStat * 1.15)) && pokemonPairId != pokemonId){
-        pokemonPairId = Math.floor(Math.random() * maxPokemonID) + 1;
+        pokemonPairId = Math.floor(Math.random() * maxPokemonID);
         pokemonStatPair = getPokemonStat(statChoice, pokemonPairId);
     }
     
     question.innerHTML = questionContent[currentQuizType];
     question.innerHTML = question.innerHTML.replace("X", statChoice);
-    answer = pokemonStat > pokemonStatPair ? [pokemon[pokemonId-1].Name] : [pokemon[pokemonPairId-1].Name];
-    return [pokemonId, pokemonPairId];
+    answer = pokemonStat > pokemonStatPair ? [pokemon[pokemonId].Name] : [pokemon[pokemonPairId].Name];
+    return [pokemonId+1, pokemonPairId+1];
 }
 
 function getPokemonStat(statChoice: string, pokemonId: number): number{
@@ -238,27 +238,21 @@ function displayPokemon(isRealShiny: boolean){
     const ctx = canvas.getContext('2d', {willReadFrequently: true})!;
 
     let isPair = currentPokemonImageUrl.length == 2;
-    if(isPair){
-        loadImages(function(images){
+    loadImages(function(images){
+        if(isPair){
             ctx.drawImage(images[0], 0, canvas.height/4, canvas.width/2, canvas.height/2);
             ctx.drawImage(images[1], canvas.width/2, canvas.height/4, canvas.width/2, canvas.height/2);
-        });
-        ctx.reset();
-    }
-    else{
-        loadedImage = new Image();
-        loadedImage.src = currentPokemonImageUrl[0];
-        
-        loadedImage.onload = function(){
-            if(loadedImage.width <= 100) {
-                canvas.width = loadedImage.width * 4;
-                canvas.height = loadedImage.height * 4;
+        }
+        else{
+            if(images[0].width <= 100) {
+                canvas.width = images[0].width * 4;
+                canvas.height = images[0].height * 4;
             } else {
-                canvas.width = loadedImage.width;
-                canvas.height = loadedImage.height;
+                canvas.width = images[0].width;
+                canvas.height = images[0].height;
             }
             
-            ctx.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(images[0], 0, 0, canvas.width, canvas.height);
 
             if(!isRealShiny) {
                 let rawImage = ctx.getImageData(0,0,canvas.width,canvas.height);
@@ -281,21 +275,21 @@ function displayPokemon(isRealShiny: boolean){
                 ctx.putImageData(rawImage,0,0);
             }
         }
-    }
+    });
+    ctx.reset();
+}
 
-    function loadImages(callback: (arg0: { [id: number]: HTMLImageElement; }) => void){
-        var loadedImages = 0;
-        var numImages = currentPokemonImageUrl.length;
-        let images: {[id: number] : HTMLImageElement} = {};
-
-        for(let i = 0; i < numImages; i++){
-            images[i] = new Image();
-            images[i].onload = function() {
-                if(++loadedImages >= numImages){
-                    callback(images)
-                }
-            };
-            images[i].src = currentPokemonImageUrl[i];
-        }
+function loadImages(callback: (arg0: { [id: number]: HTMLImageElement; }) => void){
+    var loadedImages = 0;
+    var numImages = currentPokemonImageUrl.length;
+    let images: {[id: number] : HTMLImageElement} = {};
+    for(let i = 0; i < numImages; i++){
+        images[i] = new Image();
+        images[i].onload = function() {
+            if(++loadedImages >= numImages){
+                callback(images)
+            }
+        };
+        images[i].src = currentPokemonImageUrl[i];
     }
 }
