@@ -143,7 +143,7 @@ function generatePokemon(){
         case QUIZTYPE.SPECIES:
             generateSingleMonQuizData();
             currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png'];
-            answer = [pokemon[currentPokemonID[0]-1].Species.toLowerCase()];
+            answer = [pokemon[currentPokemonID[0]-1].Species.toLowerCase().replace(' pokémon', '')];
             break;
         case QUIZTYPE.STATVS:
             currentPokemonID = generatePokemonPair();
@@ -232,7 +232,6 @@ function checkAnswer(input:string){
     }
 }
 
-//dynamic sillouhette function used from https://github.com/Menardi/whosthatpokemon/
 function displayPokemon(isRealShiny: boolean){
     const canvas = <HTMLCanvasElement> document.getElementById("shadowImage");
     const ctx = canvas.getContext('2d', {willReadFrequently: true})!;
