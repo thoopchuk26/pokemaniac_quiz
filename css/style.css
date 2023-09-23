@@ -192,15 +192,3 @@ h2.sectionHead {
 #logo {
     margin-left: 15px;
 }
-
-.imageContainer .quizImage{
-    width: 45%;
-    height: auto;
-    object-fit: contain;
-}
-
-.imageContainer.solo .quizImage{
-    width: 80%;
-    height: auto;
-    object-fit: contain;
-}

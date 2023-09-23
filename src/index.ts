@@ -25,8 +25,8 @@ type Difficulty = typeof DIFFICULTY[DifficultyKey];
 type QuizTypeKey = keyof typeof QUIZTYPE;
 type QuizType = typeof QUIZTYPE[QuizTypeKey];
 
-let pendingDifficulty: Difficulty;
 let currentQuizType:QuizType = QUIZTYPE.ABILITY as QuizType;
+let currentDifficulty:Difficulty = DIFFICULTY.GREATBALL as Difficulty;
 
 let maxPokemonID: number = pokemon[pokemon.length-1]['ID'];
 
@@ -36,17 +36,18 @@ let currentPokemonImageUrl: string[];
 let upcomingPokemon: number[];
 let currentPokemonIndex: number;
 let timeTaken: number = -1;
+let streak: number = 0;
 
 let question: HTMLElement;
 let answer: string[];
-let loadedImage: HTMLImageElement;
-let imagePair: HTMLImageElement;
 
-let questionContent: string[] = 
-["What's an Ability this Pokemon has?", 
-"What's that Pokemon's Species?",
-"Is this Pokemon's Shiny Sprite Correct?",
-"Which Pokemon has the Higher X Stat"];
+let questionContent = {
+    0 : ["What's a Pokemon that has this ability?","What's an Ability this Pokemon has?","What's this Pokemon's Hidden Ability"],
+    1 : ["What's a Pokemon that is of this Species?", "what's this Pokemon's Species?"],
+    2 : ["Is this Shiny Pokemon's Sprite Correct?"],
+    3 : ["Which Pokemon has the Larger Stat Total?", "Which Pokemon has the Higher X Stat?", "Which Pokemon has the Higher X Stat or are they the same?"],
+    4 : ["Does this Pokemon learn X?"]
+}
 
 let elements: {
     canvas: HTMLCanvasElement;
@@ -84,7 +85,7 @@ const onReady = () => {
         ev.preventDefault();
         setDifficulty(parseInt(this.getAttribute('data-difficulty')!, 10) as Difficulty);
     };
-    document.querySelectorAll('.diffSelector').forEach(el => el.addEventListener('click', onDiffMenuClick));
+    document.querySelectorAll('.diffSelect').forEach(el => el.addEventListener('click', onDiffMenuClick));
 
     const onUnknownClick = function (this:HTMLElement) {
         generatePokemon();
@@ -115,15 +116,34 @@ function generatePokemon(){
     switch (currentQuizType){
         case QUIZTYPE.ABILITY:
             generateSingleMonQuizData();
+            let ability: string[] = [];
+            if(currentDifficulty == DIFFICULTY.ULTRABALL){
+                while(pokemon[currentPokemonID[0]-1].HiddenAbility == 'N/A'){
+                    generateSingleMonQuizData();
+                }
+                ability = [pokemon[currentPokemonID[0]-1].HiddenAbility];
+            }
+            else if (pokemon[currentPokemonID[0]-1].HiddenAbility != 'N/A'){
+                ability.push(pokemon[currentPokemonID[0]-1].HiddenAbility.toLowerCase());
+            }
+            pokemon[currentPokemonID[0]-1].Ability.toLowerCase().split(/[\s,]+/).forEach((e) => ability.push(e));
             currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png'];
-            let temp = pokemon[currentPokemonID[0]-1].Ability.toLowerCase().split(/[\s,]+/);
-            if(pokemon[currentPokemonID[0]-1].HiddenAbility != 'N/A'){
-                temp.push(pokemon[currentPokemonID[0]-1].HiddenAbility.toLowerCase());
+            if(currentDifficulty == DIFFICULTY.POKEBALL){
+                let abilityChoice = ability[Math.floor(Math.random()* ability.length)];
+                let pokemonList: string[] = [];
+                for(let i = 0; i < maxPokemonID; i++){
+                    if(pokemon[i].Ability.includes(abilityChoice) || pokemon[i].HiddenAbility.includes(abilityChoice)){
+                        pokemonList.push(pokemon[i].Name);
+                    }
+                }
+                answer = pokemonList;
             }
-            for(let i = 0; i < temp.length; i++){
-                temp[i] = temp[i].replace("-", " ");
+            else{
+                for(let i = 0; i < ability.length; i++){
+                    ability[i] = ability[i].replace("-", " ");
+                }
+                answer = currentDifficulty == DIFFICULTY.GREATBALL ? ability : [ability[0]];
             }
-            answer = temp;
             break;
         case QUIZTYPE.SHINY:
             generateSingleMonQuizData();
@@ -154,7 +174,12 @@ function generatePokemon(){
             break;
     }
     console.log(answer);
+    console.log(currentDifficulty);
     displayPokemon(isRealShiny);
+}
+
+function generateAnswer(){
+    
 }
 
 function generateSingleMonQuizData(){
@@ -186,7 +211,7 @@ function generatePokemonPair(): number[]{
         pokemonStatPair = getPokemonStat(statChoice, pokemonPairId);
     }
     
-    question.innerHTML = questionContent[currentQuizType];
+    question.innerHTML = questionContent[currentQuizType][currentDifficulty];
     question.innerHTML = question.innerHTML.replace("X", statChoice);
     answer = pokemonStat > pokemonStatPair ? [pokemon[pokemonId].Name] : [pokemon[pokemonPairId].Name];
     return [pokemonId+1, pokemonPairId+1];
@@ -205,18 +230,14 @@ function getPokemonStat(statChoice: string, pokemonId: number): number{
 }
 
 function setDifficulty(selectedDifficulty: Difficulty){
-
+    currentDifficulty = selectedDifficulty;
+    question.innerHTML = questionContent[currentQuizType][currentDifficulty];
+    generatePokemon();
 }
 
 function setQuizType(selectedQuiz: QuizType){
-    if(selectedQuiz == QUIZTYPE.STATVS && currentQuizType != QUIZTYPE.STATVS){
-        document.querySelector(".imageContainer")!.classList.toggle("solo");
-    }
-    else if(selectedQuiz != QUIZTYPE.STATVS && currentQuizType == QUIZTYPE.STATVS){
-        document.querySelector(".imageContainer")!.classList.toggle("solo");
-    }
     currentQuizType = selectedQuiz;
-    question.innerHTML = questionContent[currentQuizType];
+    question.innerHTML = questionContent[currentQuizType][currentDifficulty];
     generatePokemon();
 }
 
