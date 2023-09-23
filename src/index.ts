@@ -42,8 +42,8 @@ let question: HTMLElement;
 let answer: string[];
 
 let questionContent = {
-    0 : ["What's a Pokemon that has this ability?","What's an Ability this Pokemon has?","What's this Pokemon's Hidden Ability"],
-    1 : ["What's a Pokemon that is of this Species?", "what's this Pokemon's Species?"],
+    0 : ["What's a Pokemon that has the X ability?","What's an Ability this Pokemon has?","What's this Pokemon's Hidden Ability?"],
+    1 : ["What's a Pokemon that is of the X Species?", "what's this Pokemon's Species?"],
     2 : ["Is this Shiny Pokemon's Sprite Correct?"],
     3 : ["Which Pokemon has the Larger Stat Total?", "Which Pokemon has the Higher X Stat?", "Which Pokemon has the Higher X Stat or are they the same?"],
     4 : ["Does this Pokemon learn X?"]
@@ -136,6 +136,10 @@ function generatePokemon(){
                         pokemonList.push(pokemon[i].Name);
                     }
                 }
+
+                question.innerHTML = questionContent[currentQuizType][currentDifficulty];
+                question.innerHTML = question.innerHTML.replace("X", abilityChoice);
+                currentPokemonImageUrl = ['images/question_mark.png'];
                 answer = pokemonList;
             }
             else{
@@ -162,11 +166,30 @@ function generatePokemon(){
             break;
         case QUIZTYPE.SPECIES:
             generateSingleMonQuizData();
-            currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png'];
-            answer = [pokemon[currentPokemonID[0]-1].Species.toLowerCase().replace(' pokémon', '')];
+            if(currentDifficulty == DIFFICULTY.POKEBALL){
+                let pokemonList: string[] = [];
+                for(let i = 0; i < maxPokemonID; i++){
+                    if(pokemon[i].Species.includes(pokemon[currentPokemonID[0]-1].Species)){
+                        pokemonList.push(pokemon[i].Name);
+                    }
+                }
+                question.innerHTML = questionContent[currentQuizType][currentDifficulty];
+                question.innerHTML = question.innerHTML.replace("X", pokemon[currentPokemonID[0]-1].Species);
+                currentPokemonImageUrl = ['images/question_mark.png'];
+                answer = pokemonList;
+            }
+            else{
+                currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png'];
+                answer = [pokemon[currentPokemonID[0]-1].Species.toLowerCase().replace(' pokémon', '')];
+            }
             break;
         case QUIZTYPE.STATVS:
-            currentPokemonID = generatePokemonPair();
+            if(currentDifficulty == DIFFICULTY.ULTRABALL){
+                currentPokemonID = generatePokemonPair(0.1);
+            }
+            else{
+                currentPokemonID = generatePokemonPair(0.2);
+            }
             currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png', 'images/sprites/front_default_sprite/' + currentPokemonID[1].toString() + '.png'];
             isPair = true;
             break;
@@ -198,22 +221,42 @@ function generateRandomArray(){
     currentPokemonIndex = 0;
 }
 
-function generatePokemonPair(): number[]{
+function generatePokemonPair(range: number): number[]{
     let pokemonId = Math.floor(Math.random() * maxPokemonID);
     let pokemonPairId: number = -1;
 
-    let statChoice = stats[Math.floor(Math.random()*7)];
+    let statChoice: string;
+    if(currentDifficulty == DIFFICULTY.POKEBALL){
+        statChoice = stats[stats.length-1];
+    }
+    else{
+        statChoice = stats[Math.floor(Math.random()*6)];
+    }
     let pokemonStat: number = getPokemonStat(statChoice, pokemonId);
     let pokemonStatPair: number = 0;
-
-    while((pokemonStatPair < Math.floor(pokemonStat * 0.85) || pokemonStatPair > Math.floor(pokemonStat * 1.15)) && pokemonPairId != pokemonId){
-        pokemonPairId = Math.floor(Math.random() * maxPokemonID);
-        pokemonStatPair = getPokemonStat(statChoice, pokemonPairId);
+    
+    if(currentDifficulty == DIFFICULTY.ULTRABALL){
+        while((pokemonStatPair < Math.floor(pokemonStat * (1-range)) || pokemonStatPair > Math.floor(pokemonStat * (1+range))) || pokemonPairId == pokemonId){
+            pokemonPairId = Math.floor(Math.random() * maxPokemonID);
+            pokemonStatPair = getPokemonStat(statChoice, pokemonPairId);
+        }
+    }
+    else{
+        while((pokemonStatPair < Math.floor(pokemonStat * (1-range)) || pokemonStatPair > Math.floor(pokemonStat * (1+range))) || pokemonPairId == pokemonId || pokemonStat == pokemonStatPair){
+            pokemonPairId = Math.floor(Math.random() * maxPokemonID);
+            pokemonStatPair = getPokemonStat(statChoice, pokemonPairId);
+        }
     }
     
     question.innerHTML = questionContent[currentQuizType][currentDifficulty];
     question.innerHTML = question.innerHTML.replace("X", statChoice);
-    answer = pokemonStat > pokemonStatPair ? [pokemon[pokemonId].Name] : [pokemon[pokemonPairId].Name];
+
+    if(pokemonStat == pokemonStatPair){
+        answer = ["same"];
+    }
+    else{
+        answer = pokemonStat > pokemonStatPair ? [pokemon[pokemonId].Name] : [pokemon[pokemonPairId].Name];
+    }
     return [pokemonId+1, pokemonPairId+1];
 }
 
