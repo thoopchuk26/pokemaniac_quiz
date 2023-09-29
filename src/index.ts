@@ -372,6 +372,10 @@ function checkAnswer(input: string, buttonAnswer: number){
             if(answer[0] == "same"){
                 increaseStreak();
             }
+            else{
+                streak = 0;
+                waitingRoom();
+            }
         }
         else{
             if(pokemon[currentPokemonID[buttonAnswer]-1].Name == answer[0]){
