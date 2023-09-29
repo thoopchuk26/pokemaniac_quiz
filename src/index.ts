@@ -37,6 +37,8 @@ let upcomingPokemon: number[];
 let currentPokemonIndex: number;
 let timeTaken: number = -1;
 let streak: number = 0;
+let best: number = 0;
+let isTypeInput: boolean = true;
 
 let question: HTMLElement;
 let answer: string[];
@@ -57,6 +59,9 @@ let elements: {
     input: HTMLInputElement;
     playArea: HTMLElement;
     settingsChangeMessage: HTMLElement;
+    streakCount: HTMLElement;
+    bestStreak: HTMLElement;
+    nextQuestion: HTMLElement;
 };
 
 const onReady = () => {
@@ -68,6 +73,9 @@ const onReady = () => {
         input: document.getElementById('guess') as HTMLInputElement,
         playArea: document.getElementById('playArea') as HTMLElement,
         settingsChangeMessage: document.getElementById('infoBoxMain') as HTMLElement,
+        streakCount: document.getElementById('streakCount') as HTMLElement,
+        bestStreak: document.getElementById('bestStreak') as HTMLElement,
+        nextQuestion : document.getElementById('nextQuestion') as HTMLElement
     }
 
     const onSideBarClick = function (this: HTMLElement) {
@@ -77,6 +85,7 @@ const onReady = () => {
 
     const onQuizMenuClick = function (this: HTMLElement, ev: Event){
         ev.preventDefault();
+        currentDifficulty = DIFFICULTY.GREATBALL;
         setQuizType(parseInt(this.getAttribute('quiz-type')!, 10) as QuizType);
     };
     document.querySelectorAll('.quizSelector').forEach(el => el.addEventListener('click', onQuizMenuClick));
@@ -88,18 +97,32 @@ const onReady = () => {
     document.querySelectorAll('.diffSelect').forEach(el => el.addEventListener('click', onDiffMenuClick));
 
     const onUnknownClick = function (this:HTMLElement) {
-        generatePokemon();
+        streak = 0;
+        waitingRoom();
     }
     document.querySelector('.dontKnow')!.addEventListener('click', onUnknownClick);
 
+    const onAnswerButtonClick = function (this: HTMLElement, ev: Event){
+        ev.preventDefault();
+        checkAnswer("", parseInt(this.getAttribute('data-truth')!, 10) as number);
+    };
+    document.querySelectorAll('.button').forEach(el => el.addEventListener('click', onAnswerButtonClick));
+
+    const onNextClick = function (this:HTMLElement) {
+        setMenu();
+        elements.nextQuestion.hidden = true;
+        generateQuizContent();
+    }
+    document.querySelector('.next')!.addEventListener('click', onNextClick);
+
     
     elements.input.addEventListener('input', function (this: HTMLInputElement) {
-        checkAnswer(this.value);
+        checkAnswer(this.value, -1);
     });
 
     question = document.querySelector('.question')!;
     generateRandomArray();
-    generatePokemon();
+    generateQuizContent();
 }
 
 if (document.readyState !== 'loading') {
@@ -108,13 +131,13 @@ if (document.readyState !== 'loading') {
     document.addEventListener('DOMContentLoaded', onReady);
 }
 
-function generatePokemon(){
-    elements.input.hidden = false;
-    elements.dontKnowButton.innerHTML = "I Don't Know";
+function generateQuizContent(){
     let isPair: boolean = false;
     let isRealShiny: boolean = true;
+    elements.dontKnowButton.style.visibility = "visible";
     switch (currentQuizType){
         case QUIZTYPE.ABILITY:
+            isTypeInput = true;
             generateSingleMonQuizData();
             let ability: string[] = [];
             if(currentDifficulty == DIFFICULTY.ULTRABALL){
@@ -150,6 +173,9 @@ function generatePokemon(){
             }
             break;
         case QUIZTYPE.SHINY:
+            isTypeInput = false;
+            document.getElementById("trueButton")!.innerHTML = "True";
+            document.getElementById("falseButton")!.innerHTML = "False";
             generateSingleMonQuizData();
             while (currentPokemonID[0] > 905){
                 generateSingleMonQuizData();
@@ -165,6 +191,7 @@ function generatePokemon(){
             answer = [isRealShiny.toString()];
             break;
         case QUIZTYPE.SPECIES:
+            isTypeInput = true;
             generateSingleMonQuizData();
             if(currentDifficulty == DIFFICULTY.POKEBALL){
                 let pokemonList: string[] = [];
@@ -184,6 +211,7 @@ function generatePokemon(){
             }
             break;
         case QUIZTYPE.STATVS:
+            isTypeInput = false;
             if(currentDifficulty == DIFFICULTY.ULTRABALL){
                 currentPokemonID = generatePokemonPair(0.1);
             }
@@ -192,17 +220,14 @@ function generatePokemon(){
             }
             currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png', 'images/sprites/front_default_sprite/' + currentPokemonID[1].toString() + '.png'];
             isPair = true;
+            document.getElementById("trueButton")!.innerHTML = pokemon[currentPokemonID[0]-1].Name;
+            document.getElementById("falseButton")!.innerHTML = pokemon[currentPokemonID[1]-1].Name;
             break;
         default:
             break;
     }
     console.log(answer);
-    console.log(currentDifficulty);
     displayPokemon(isRealShiny);
-}
-
-function generateAnswer(){
-    
 }
 
 function generateSingleMonQuizData(){
@@ -273,27 +298,126 @@ function getPokemonStat(statChoice: string, pokemonId: number): number{
 }
 
 function setDifficulty(selectedDifficulty: Difficulty){
-    currentDifficulty = selectedDifficulty;
-    question.innerHTML = questionContent[currentQuizType][currentDifficulty];
-    generatePokemon();
+    if(selectedDifficulty != currentDifficulty){
+        currentDifficulty = selectedDifficulty;
+        question.innerHTML = questionContent[currentQuizType][currentDifficulty];
+        if(currentDifficulty == DIFFICULTY.ULTRABALL && currentQuizType == QUIZTYPE.STATVS){
+            document.getElementById("equalButton")!.hidden = false;
+        }
+        else{
+            document.getElementById("equalButton")!.hidden = true;
+        }
+        generateQuizContent();
+    }
 }
 
 function setQuizType(selectedQuiz: QuizType){
     currentQuizType = selectedQuiz;
-    question.innerHTML = questionContent[currentQuizType][currentDifficulty];
-    generatePokemon();
-}
-
-function checkAnswer(input:string){
-    if(answer.includes(input.toLowerCase())){
-        console.log("correct");
-        elements.input.value = "";
-        elements.input.hidden = true;
-        elements.dontKnowButton.innerHTML = "Next Question";
+    if(currentQuizType == QUIZTYPE.SHINY){
+        question.innerHTML = questionContent[currentQuizType][0];
     }
     else{
-        console.log("incorrect");
+        question.innerHTML = questionContent[currentQuizType][currentDifficulty];
     }
+    setMenu();
+    generateQuizContent();
+}
+
+function setMenu(){
+    document.getElementById("diff0")!.hidden = false;
+    document.getElementById("diff2")!.hidden = false;
+    switch(currentQuizType){
+        case QUIZTYPE.ABILITY:
+            document.getElementById("trueButton")!.hidden = true;
+            document.getElementById("falseButton")!.hidden = true;
+            document.getElementById("equalButton")!.hidden = true;
+            elements.input.hidden = false;
+            break;
+        case QUIZTYPE.SPECIES:
+            document.getElementById("trueButton")!.hidden = true;
+            document.getElementById("falseButton")!.hidden = true;
+            document.getElementById("equalButton")!.hidden = true;
+            document.getElementById("diff2")!.hidden = true;
+            elements.input.hidden = false;
+            break;
+            
+        case QUIZTYPE.SHINY:
+            document.getElementById("trueButton")!.hidden = false;
+            document.getElementById("falseButton")!.hidden = false;
+            document.getElementById("equalButton")!.hidden = true;
+            document.getElementById("diff0")!.hidden = true;
+            document.getElementById("diff2")!.hidden = true;
+            elements.input.hidden = true;
+            break;
+        case QUIZTYPE.STATVS:
+            document.getElementById("trueButton")!.hidden = false;
+            document.getElementById("falseButton")!.hidden = false;
+            elements.input.hidden = true;
+            if(currentDifficulty == DIFFICULTY.ULTRABALL){
+                document.getElementById("equalButton")!.hidden = false;
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+function checkAnswer(input: string, buttonAnswer: number){
+    if(answer.includes(input.toLowerCase())){
+        increaseStreak();
+    }
+
+    if(currentQuizType == QUIZTYPE.STATVS){
+        if(buttonAnswer == 2){
+            if(answer[0] == "same"){
+                increaseStreak();
+            }
+        }
+        else{
+            if(pokemon[currentPokemonID[buttonAnswer]-1].Name == answer[0]){
+                increaseStreak();
+            }
+            else{
+                streak = 0;
+                waitingRoom();
+             }
+        }
+    }
+
+    if(currentQuizType == QUIZTYPE.SHINY){
+        if(answer[0] == "true" && buttonAnswer == 0){
+            increaseStreak();
+        }
+        else if(answer[0] == "false" && buttonAnswer == 1){
+            increaseStreak();
+        }
+        else{
+            streak = 0;
+            waitingRoom();
+        }
+    }
+}
+
+function increaseStreak(){
+    if (streak == best){
+        best += 1;
+    }
+    streak += 1;
+    waitingRoom();
+}
+
+function waitingRoom(){
+    elements.input.value = "";
+    elements.input.hidden = true;
+    document.getElementById("trueButton")!.hidden = true;
+    document.getElementById("falseButton")!.hidden = true;
+    document.getElementById("equalButton")!.hidden = true;
+
+    elements.dontKnowButton.style.visibility = "hidden";
+    elements.nextQuestion.hidden = false;
+
+    elements.bestStreak.innerHTML = best.toString();
+    elements.streakCount.innerHTML = streak.toString();
 }
 
 function displayPokemon(isRealShiny: boolean){

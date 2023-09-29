@@ -62,12 +62,12 @@
             <h2 id="streakHeader" class="sectionHead">Streak</h2>
 			<div class="sidebox">
 				<h3 class="translatable">Current</h3>
-				<h1 class="currentCountText">0</h1>
+				<h1 id = "streakCount" class="currentCountText">0</h1>
 			</div>
 
             <div class="sidebox">
 				<h3 class="translatable">Best</h3>
-				<h1 class="bestCountText">0</h1>
+				<h1 id="bestStreak" class="bestCountText">0</h1>
 			</div>
 
             <h2 id="difficultyHeader" class="sectionHead translatable" data-lang="difficulty">Difficulty</h2>
@@ -93,8 +93,13 @@
                 
                     <div id="answerArea">
                         <input type="text" id="guess" name="guess" tabindex="1" autocomplete="off" autocorrect="off" spellcheck="false" />
+                        
+                        <button hidden data-truth="0" id="trueButton" class="button">True</button>
+                        <button hidden data-truth="1" id="falseButton" class="button">False</button>
+                        <button hidden data-truth="2" id="equalButton" class="button">Same</button>
 
                         <a id="giveAnswer" class="dontKnow">I don't know!</a>
+                        <a hidden id="nextQuestion" class="next">Next Question</a>
                     </div>
                 </div>
             </div>
