@@ -192,3 +192,31 @@ h2.sectionHead {
 #logo {
     margin-left: 15px;
 }
+
+button {
+    background-color: #7400BA; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #EE89FF;
+}
+
+input {
+    margin: 1em 0 5px;
+    height: 50px;
+    font-size: 175%;
+    border: 0;
+    border-radius: 10px;
+    text-align: center;
+    text-transform: capitalize;
+    font-family: 'Cantora One', sans-serif;
+    outline: none;
+}
+

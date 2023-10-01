@@ -220,13 +220,12 @@ function generateQuizContent(){
             }
             currentPokemonImageUrl = ['images/sprites/front_default_sprite/' + currentPokemonID[0].toString() + '.png', 'images/sprites/front_default_sprite/' + currentPokemonID[1].toString() + '.png'];
             isPair = true;
-            document.getElementById("trueButton")!.innerHTML = pokemon[currentPokemonID[0]-1].Name;
-            document.getElementById("falseButton")!.innerHTML = pokemon[currentPokemonID[1]-1].Name;
+            document.getElementById("trueButton")!.innerHTML = pokemon[currentPokemonID[0]-1].Name.charAt(0).toUpperCase() + pokemon[currentPokemonID[0]-1].Name.slice(1);
+            document.getElementById("falseButton")!.innerHTML = pokemon[currentPokemonID[1]-1].Name.charAt(0).toUpperCase() + pokemon[currentPokemonID[1]-1].Name.slice(1);;
             break;
         default:
             break;
     }
-    console.log(answer);
     displayPokemon(isRealShiny);
 }
 
